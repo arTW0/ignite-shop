@@ -2,7 +2,15 @@ import { NextApiResponse, NextApiRequest } from "next";
 import { stripe } from "../../lib/stripe";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const priceId = 'price_1NezVAATD9nYntm99eTJAWLD';
+  const { priceId } = req.body;
+
+  if (req.method !== 'POST') {
+    return res.status(405).json('Method not allowed');
+  }
+
+  if (!priceId) {
+    return res.status(400).json({ error: 'Price not provided' });
+  }
 
   const successUrl = `${process.env.NEXT_URL}/success`
   const cancelUrl = `${process.env.NEXT_URL}/`
@@ -20,6 +28,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   })
 
   return res.status(201).json({
-    checkouUrl: checkoutSession.url,
+    checkoutUrl: checkoutSession.url,
   });
 }
